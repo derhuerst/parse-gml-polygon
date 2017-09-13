@@ -1,5 +1,7 @@
 'use strict'
 
+const deepStrictEqual = require('deep-strict-equal')
+
 const parseCoords = (s) => {
 	const coords = s.split(' ')
 	if (coords.length === 0 || (coords.length % 2) !== 0) {
@@ -32,7 +34,7 @@ const parsePosList = (_) => {
 }
 
 const parsePos = (_) => {
-	const coords = textOf(pos)
+	const coords = textOf(_)
 	if (!coords) throw new Error('invalid gml:pos element')
 
 	const points = parseCoords(coords)
@@ -40,43 +42,77 @@ const parsePos = (_) => {
 	return points
 }
 
-const parseLinearRing = (_) => {
-	const posList = _.children.find(c => c.name === 'gml:posList')
-	// todo: return type: Polygon ?
-	if (posList) return parsePosList(posList)
+const parseLinearRingOrLineString = (_) => {
+	let points = []
 
-	const points = []
-	for (let c of children) {
-		if (c.name === 'gml:Point') {
-			const pos = child.children.find(c => c.name === 'pos')
-			if (!pos) continue
-			points.push(parsePos(pos)[0])
-		} else if (c.name === 'gml:pos') {
-			points.push(parsePos(c)[0])
+	const posList = _.children.find(c => c.name === 'gml:posList')
+	if (posList) points = parsePosList(posList)
+	else {
+		for (let c of _.children) {
+			if (c.name === 'gml:Point') {
+				const pos = c.children.find(c => c.name === 'gml:pos')
+				if (!pos) continue
+				points.push(parsePos(pos)[0])
+			} else if (c.name === 'gml:pos') {
+				points.push(parsePos(c)[0])
+			}
 		}
 	}
 
-	if (points.length === 0) throw new Error('gml:LinearRing must have >= points')
+	if (points.length === 0) throw new Error(_.name + ' must have > 0 points')
 	return points
 }
 
-const parsePolygon = (_) => {
+const parseRing = (_) => {
+	const points = []
+
+	for (let c of _.children) {
+		if (c.name !== 'gml:curveMember') continue
+
+		const lineString = c.children.find(c => c.name === 'gml:LineString')
+		if (!lineString) {
+			throw new Error(c.name + ' without gml:LineString is not supported')
+		}
+
+		const points2 = parseLinearRingOrLineString(lineString)
+
+		// remove overlapping
+		const end = points[points.length - 1]
+		const start = points2[0]
+		if (end && start && deepStrictEqual(end, start)) points2.shift()
+
+		points.push(...points2)
+	}
+
+	if (points.length === 0) throw new Error('gml:Ring must have > 0 points')
+	return points
+}
+
+const parsePolygonOrRectangle = (_) => {
 	const exterior = _.children.find(c => c.name === 'gml:exterior')
 	if (!exterior) {
-		throw new Error('gml:Polygon without gml:exterior is not supported')
+		throw new Error(_.name + ' without gml:exterior is not supported')
 	}
+
+	let points = []
 
 	const linearRing = exterior.children.find(c => c.name === 'gml:LinearRing')
-	if (!linearRing) {
-		throw new Error('gml:exterior without gml:LinearRing is not supported')
+	if (linearRing) {
+		points = parseLinearRingOrLineString(linearRing)
+	} else {
+		const ring = exterior.children.find(c => c.name === 'gml:Ring')
+		if (ring) {
+			points = parseRing(ring)
+		} else throw new Error('invalid gml:exterior element')
 	}
 
-	return {type: 'Polygon', coordinates: parseLinearRing(linearRing)}
+	return {type: 'Polygon', coordinates: [points]}
 }
 
 module.exports = {
 	parsePosList,
 	parsePos,
-	parseLinearRing,
-	parsePolygon
+	parseLinearRingOrLineString,
+	parseRing,
+	parsePolygonOrRectangle
 }

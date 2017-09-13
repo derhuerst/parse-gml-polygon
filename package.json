@@ -30,5 +30,8 @@
 	"scripts": {
 		"test": "node test.js | tap-min",
 		"prepublishOnly": "npm test"
+	},
+	"dependencies": {
+		"deep-strict-equal": "^0.2.0"
 	}
 }
