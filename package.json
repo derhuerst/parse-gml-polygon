@@ -22,11 +22,10 @@
 	"engines": {
 		"node": ">=6"
 	},
-	"dependencies": {
-	},
 	"devDependencies": {
-		"tape": "^4.6.3",
-		"tap-min": "^1.2.1"
+		"hyper-xml": "^0.1.1",
+		"tap-min": "^1.2.1",
+		"tape": "^4.6.3"
 	},
 	"scripts": {
 		"test": "node test.js | tap-min",
