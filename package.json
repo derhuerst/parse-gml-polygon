@@ -1,0 +1,35 @@
+{
+	"name": "parse-gml-polygon",
+	"description": "Convert a GML Polygon into GeoJSON.",
+	"version": "0.1.0",
+	"main": "index.js",
+	"files": [
+		"index.js"
+	],
+	"keywords": [
+		"gml",
+		"geographic markup language",
+		"geojson",
+		"parse",
+		"convert",
+		"gis"
+	],
+	"author": "Jannis R <mail@jannisr.de>",
+	"homepage": "https://github.com/derhuerst/parse-gml-polygon",
+	"repository": "derhuerst/parse-gml-polygon",
+	"bugs": "https://github.com/derhuerst/parse-gml-polygon/issues",
+	"license": "ISC",
+	"engines": {
+		"node": ">=6"
+	},
+	"dependencies": {
+	},
+	"devDependencies": {
+		"tape": "^4.6.3",
+		"tap-min": "^1.2.1"
+	},
+	"scripts": {
+		"test": "node test.js | tap-min",
+		"prepublishOnly": "npm test"
+	}
+}
