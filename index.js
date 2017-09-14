@@ -164,6 +164,28 @@ const parseSurface = (_, transformCoords) => {
 	return polygons
 }
 
+const parseMultiSurface = (_, transformCoords) => {
+	let el = _
+
+	const surfaceMembers = findIn(_, 'gml:LinearRing')
+	if (surfaceMembers) el = surfaceMembers
+
+	const polygons = []
+	for (let c of el.children) {
+		if (c.name === 'gml:Surface') {
+			const polygons2 = parseSurface(c, transformCoords)
+			polygons.push(...polygons2)
+		} else if (c.name === 'gml:surfaceMember') {
+			const surface = findIn(c, 'gml:Surface')
+			const polygons2 = parseSurface(surface, transformCoords)
+			polygons.push(...polygons2)
+		}
+	}
+
+	if (polygons.length === 0) throw new Error(_.name + ' must have > 0 polygons')
+	return polygons
+}
+
 const noTransform = (x, y) => [x, y]
 
 const parse = (_, transformCoords = noTransform) => {
@@ -177,6 +199,11 @@ const parse = (_, transformCoords = noTransform) => {
 			type: 'MultiPolygon',
 			coordinates: parseSurface(_, transformCoords)
 		}
+	} else if (_.name === 'gml:MultiSurface') {
+		return {
+			type: 'MultiPolygon',
+			coordinates: parseMultiSurface(_, transformCoords)
+		}
 	}
 	return null // todo
 }
@@ -188,6 +215,7 @@ Object.assign(parse, {
 	parseRing,
 	parseExteriorOrInterior,
 	parsePolygonOrRectangle,
-	parseSurface
+	parseSurface,
+	parseMultiSurface
 })
 module.exports = parse

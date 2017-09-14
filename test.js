@@ -221,7 +221,7 @@ test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) =
 	t.end()
 })
 
-test('Surface > patches > Rectangle > exterior > LinearRing > posList', (t) => {
+test('Surface > patches > Rectangle*2 > exterior > LinearRing > posList', (t) => {
 	const p = h('gml:Surface', {'gml:id': 'some-id'}, [
 		h('gml:patches', [
 			h('gml:Rectangle', {'gml:id': 'a'}, [
@@ -238,6 +238,34 @@ test('Surface > patches > Rectangle > exterior > LinearRing > posList', (t) => {
 	])
 
 	t.deepEqual(parse(p, transformCoords), multiExterior)
+	t.end()
+})
+
+test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t) => {
+	const s1 = h('gml:Surface', {'gml:id': 's1'}, [
+		h('gml:patches', [
+			h('gml:Rectangle', [
+				h('gml:exterior', [
+					h('gml:LinearRing', [posList(coordsA)])
+				])
+			])
+		])
+	])
+	const s2 = h('gml:Surface', {'gml:id': 's2'}, [
+		h('gml:patches', [
+			h('gml:Rectangle', [
+				h('gml:exterior', [
+					h('gml:LinearRing', [posList(coordsB)])
+				])
+			])
+		])
+	])
+	const m = h('gml:MultiSurface', {'gml:id': 'm'}, [
+		h('gml:surfaceMember', [s1]),
+		h('gml:surfaceMember', [s2])
+	])
+
+	t.deepEqual(parse(m, transformCoords), multiExterior)
 	t.end()
 })
 
