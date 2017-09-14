@@ -176,9 +176,12 @@ const parseMultiSurface = (_, transformCoords) => {
 			const polygons2 = parseSurface(c, transformCoords)
 			polygons.push(...polygons2)
 		} else if (c.name === 'gml:surfaceMember') {
-			const surface = findIn(c, 'gml:Surface')
-			const polygons2 = parseSurface(surface, transformCoords)
-			polygons.push(...polygons2)
+			const c2 = c.children[0]
+			if (c2.name === 'gml:Surface') {
+				polygons.push(...parseSurface(c2, transformCoords))
+			} else if (c2.name === 'gml:Polygon') {
+				polygons.push(parsePolygonOrRectangle(c2, transformCoords))
+			}
 		}
 	}
 

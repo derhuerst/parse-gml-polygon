@@ -269,6 +269,26 @@ test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t)
 	t.end()
 })
 
+test('MultiSurface > surfaceMember*2 > Polygon > …', (t) => {
+	const p1 = h('gml:Polygon', {'gml:id': 'p1'}, [
+		h('gml:exterior', [
+			h('gml:LinearRing', [posList(coordsA)])
+		])
+	])
+	const p2 = h('gml:Polygon', {'gml:id': 'p2'}, [
+		h('gml:exterior', [
+			h('gml:LinearRing', [posList(coordsB)])
+		])
+	])
+	const m = h('gml:MultiSurface', {'gml:id': 'm'}, [
+		h('gml:surfaceMember', [p1]),
+		h('gml:surfaceMember', [p2])
+	])
+
+	t.deepEqual(parse(m, transformCoords), multiExterior)
+	t.end()
+})
+
 test('Polygon > exterior+interior > LinearRing > posList', (t) => {
 	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
 		h('gml:exterior', [
