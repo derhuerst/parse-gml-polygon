@@ -68,6 +68,8 @@ console.log(geometry)
 }
 ```
 
+You may optionally pass in a function to transform coordinates. The default transform is `(x, y) => [x, y]`.
+
 
 ## Unsupported encodings
 

@@ -2,7 +2,7 @@
 
 const deepStrictEqual = require('deep-strict-equal')
 
-const parseCoords = (s) => {
+const parseCoords = (s, transformCoords) => {
 	const coords = s.split(' ')
 	if (coords.length === 0 || (coords.length % 2) !== 0) {
 		throw new Error('invalid coordinates list')
@@ -10,11 +10,9 @@ const parseCoords = (s) => {
 
 	const points = []
 	for (let i = 0; i < (coords.length - 1); i += 2) {
-		// todo: transform coordinates
-		points.push([
-			parseFloat(coords[i]), // x
-			parseFloat(coords[i + 1]) // y
-		])
+		const x = parseFloat(coords[i])
+		const y = parseFloat(coords[i + 1])
+		points.push(transformCoords(x, y))
 	}
 
 	return points
@@ -37,35 +35,35 @@ const findIn = (root, ...tags) => {
 	return el
 }
 
-const parsePosList = (_) => {
+const parsePosList = (_, transformCoords) => {
 	const coords = textOf(_)
 	if (!coords) throw new Error('invalid gml:posList element')
 
-	return parseCoords(coords)
+	return parseCoords(coords, transformCoords)
 }
 
-const parsePos = (_) => {
+const parsePos = (_, transformCoords) => {
 	const coords = textOf(_)
 	if (!coords) throw new Error('invalid gml:pos element')
 
-	const points = parseCoords(coords)
+	const points = parseCoords(coords, transformCoords)
 	if (points.length !== 1) throw new Error('gml:pos must have 1 point')
-	return points
+	return points[0]
 }
 
-const parseLinearRingOrLineString = (_) => { // or a LineStringSegment
+const parseLinearRingOrLineString = (_, transformCoords) => { // or a LineStringSegment
 	let points = []
 
 	const posList = findIn(_, 'gml:posList')
-	if (posList) points = parsePosList(posList)
+	if (posList) points = parsePosList(posList, transformCoords)
 	else {
 		for (let c of _.children) {
 			if (c.name === 'gml:Point') {
 				const pos = findIn(c, 'gml:pos')
 				if (!pos) continue
-				points.push(parsePos(pos)[0])
+				points.push(parsePos(pos, transformCoords))
 			} else if (c.name === 'gml:pos') {
-				points.push(parsePos(c)[0])
+				points.push(parsePos(c, transformCoords))
 			}
 		}
 	}
@@ -74,12 +72,12 @@ const parseLinearRingOrLineString = (_) => { // or a LineStringSegment
 	return points
 }
 
-const parseCurveSegments = (_) => {
+const parseCurveSegments = (_, transformCoords) => {
 	let points = []
 
 	for (let c of _.children) {
 		if (c.name !== 'gml:LineStringSegment') continue
-		const points2 = parseLinearRingOrLineString(c)
+		const points2 = parseLinearRingOrLineString(c, transformCoords)
 
 		// remove overlapping
 		const end = points[points.length - 1]
@@ -95,7 +93,7 @@ const parseCurveSegments = (_) => {
 	return points
 }
 
-const parseRing = (_) => {
+const parseRing = (_, transformCoords) => {
 	const points = []
 
 	for (let c of _.children) {
@@ -104,12 +102,12 @@ const parseRing = (_) => {
 
 		const lineString = findIn(c, 'gml:LineString')
 		if (lineString) {
-			points2 = parseLinearRingOrLineString(lineString)
+			points2 = parseLinearRingOrLineString(lineString, transformCoords)
 		} else {
 			const segments = findIn(c, 'gml:Curve', 'gml:segments')
 			if (!segments) throw new Error('invalid ' + c.name + ' element')
 
-			points2 = parseCurveSegments(segments)
+			points2 = parseCurveSegments(segments, transformCoords)
 		}
 
 		// remove overlapping
@@ -124,49 +122,61 @@ const parseRing = (_) => {
 	return points
 }
 
-const parseExteriorOrInterior = (_) => {
+const parseExteriorOrInterior = (_, transformCoords) => {
 	const linearRing = findIn(_, 'gml:LinearRing')
-	if (linearRing) return parseLinearRingOrLineString(linearRing)
+	if (linearRing) {
+		return parseLinearRingOrLineString(linearRing, transformCoords)
+	}
 
 	const ring = findIn(_, 'gml:Ring')
-	if (ring) return parseRing(ring)
+	if (ring) return parseRing(ring, transformCoords)
 
 	throw new Error('invalid ' + _.name + ' element')
 }
 
-const parsePolygonOrRectangle = (_) => { // or PolygonPatch
+const parsePolygonOrRectangle = (_, transformCoords) => { // or PolygonPatch
 	const exterior = findIn(_, 'gml:exterior')
 	if (!exterior) throw new Error('invalid ' + _.name + ' element')
 
-	const pointLists = [parseExteriorOrInterior(exterior)]
+	const pointLists = [
+		parseExteriorOrInterior(exterior, transformCoords)
+	]
 
 	for (let c of _.children) {
 		if (c.name !== 'gml:interior') continue
-		pointLists.push(parseExteriorOrInterior(c))
+		pointLists.push(parseExteriorOrInterior(c, transformCoords))
 	}
 
 	return pointLists
 }
 
-const parseSurface = (_) => {
+const parseSurface = (_, transformCoords) => {
 	const patches = findIn(_, 'gml:patches')
 	if (!patches) throw new Error('invalid ' + _.name + ' element')
 
 	const polygons = []
 	for (let c of patches.children) {
 		if (c.name !== 'gml:PolygonPatch' && c.name !== 'gml:Rectangle') continue
-		polygons.push(parsePolygonOrRectangle(c))
+		polygons.push(parsePolygonOrRectangle(c, transformCoords))
 	}
 
 	if (polygons.length === 0) throw new Error(_.name + ' must have > 0 polygons')
 	return polygons
 }
 
-const parse = (_) => {
+const noTransform = (x, y) => [x, y]
+
+const parse = (_, transformCoords = noTransform) => {
 	if (_.name === 'gml:Polygon' || _.name === 'gml:Rectangle') {
-		return {type: 'Polygon', coordinates: parsePolygonOrRectangle(_)}
+		return {
+			type: 'Polygon',
+			coordinates: parsePolygonOrRectangle(_, transformCoords)
+		}
 	} else if (_.name === 'gml:Surface') {
-		return {type: 'MultiPolygon', coordinates: parseSurface(_)}
+		return {
+			type: 'MultiPolygon',
+			coordinates: parseSurface(_, transformCoords)
+		}
 	}
 	return null // todo
 }

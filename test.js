@@ -11,15 +11,26 @@ const coordsC = [[3, 3], [3, 4], [4, 4], [4, 3], [3, 3]] // fits into B
 
 const simpleExterior = {
 	type: 'Polygon',
-	coordinates: [coordsA]
+	coordinates: [
+		[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]
+	]
 }
 const multiExterior = {
 	type: 'MultiPolygon',
-	coordinates: [[coordsA], [coordsB]]
+	coordinates: [
+		[
+			[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]
+		], [
+			[[20, 20], [20, 50], [50, 50], [50, 20], [20, 20]]
+		]
+	]
 }
 const withHole = {
 	type: 'Polygon',
-	coordinates: [coordsB, coordsC]
+	coordinates: [
+		[[20, 20], [20, 50], [50, 50], [50, 20], [20, 20]],
+		[[30, 30], [30, 40], [40, 40], [40, 30], [30, 30]]
+	]
 }
 
 const posList = (coords) => {
@@ -38,6 +49,8 @@ const point5 = (coords) => {
 	})
 }
 
+const transformCoords = (x, y) => [x * 10, y * 10]
+
 // see http://erouault.blogspot.de/2014/04/gml-madness.html
 
 // todo: SimplePolygon > posList
@@ -50,7 +63,7 @@ test('Polygon > exterior > LinearRing > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -61,7 +74,7 @@ test('Polygon > exterior > LinearRing > pos*5', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -72,7 +85,7 @@ test('Polygon > exterior > LinearRing > Point*5 > pos', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -83,7 +96,7 @@ test('Rectangle > exterior > LinearRing > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -98,7 +111,7 @@ test('Polygon > exterior > Ring > curveMember > LineString > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -113,7 +126,7 @@ test('Polygon > exterior > Ring > curveMember > LineString > pos*5', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -137,7 +150,7 @@ test('Polygon > exterior > Ring > curveMember*3 > LineString > posList', (t) => 
 		])
 	])
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -163,7 +176,7 @@ test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringS
 	])
 	// console.error(require('util').inspect(p, {depth: Infinity}))
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -184,7 +197,7 @@ test('Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSeg
 	])
 	// console.error(require('util').inspect(p, {depth: Infinity}))
 
-	t.deepEqual(parse(p), simpleExterior)
+	t.deepEqual(parse(p, transformCoords), simpleExterior)
 	t.end()
 })
 
@@ -204,7 +217,7 @@ test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) =
 		])
 	])
 
-	t.deepEqual(parse(p), multiExterior)
+	t.deepEqual(parse(p, transformCoords), multiExterior)
 	t.end()
 })
 
@@ -224,7 +237,7 @@ test('Surface > patches > Rectangle > exterior > LinearRing > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), multiExterior)
+	t.deepEqual(parse(p, transformCoords), multiExterior)
 	t.end()
 })
 
@@ -238,7 +251,7 @@ test('Polygon > exterior+interior > LinearRing > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), withHole)
+	t.deepEqual(parse(p, transformCoords), withHole)
 	t.end()
 })
 
