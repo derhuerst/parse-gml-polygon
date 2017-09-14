@@ -1,5 +1,7 @@
 # parse-gml-polygon
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/derhuerst/parse-gml-polygon.svg)](https://greenkeeper.io/)
+
 **Convert a [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language) `Polygon` into a [GeoJSON](http://geojson.org) geometry.** Accepts the format of [`xml-flow`](https://www.npmjs.com/package/xml-flow) (with the `preserveMarkup` flag) as input. Works with a subset of [GML 3.3](https://portal.opengeospatial.org/files/?artifact_id=46568).
 
 **Parsing GML is a nightmare. This module tries to parse most of the mentioned ways to encode a polygon.** I don't intend to cover all of them though. To quote [the wonderful *GML madness* article by Even Rouault](http://erouault.blogspot.de/2014/04/gml-madness.html):
