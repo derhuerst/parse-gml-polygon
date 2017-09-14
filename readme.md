@@ -1,8 +1,8 @@
 # parse-gml-polygon
 
-**Convert a [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language) `Polygon` into [GeoJSON](http://geojson.org).** Accepts the format of [`xml-flow`](https://www.npmjs.com/package/xml-flow) (with the `preserveMarkup` flag) as input. Works with a subset of [GML 3.3](https://portal.opengeospatial.org/files/?artifact_id=46568).
+**Convert a [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language) `Polygon` into a [GeoJSON](http://geojson.org) geometry.** Accepts the format of [`xml-flow`](https://www.npmjs.com/package/xml-flow) (with the `preserveMarkup` flag) as input. Works with a subset of [GML 3.3](https://portal.opengeospatial.org/files/?artifact_id=46568).
 
-**Parsing GML is a nightmare.** **This module tries to parse most of the mentioned ways to encode a polygon.** I don't intend to cover all of them though. To quote [the wonderful *GML madness* article by Even Rouault](http://erouault.blogspot.de/2014/04/gml-madness.html):
+**Parsing GML is a nightmare. This module tries to parse most of the mentioned ways to encode a polygon.** I don't intend to cover all of them though. To quote [the wonderful *GML madness* article by Even Rouault](http://erouault.blogspot.de/2014/04/gml-madness.html):
 
 > But, you may have noticed that the child of a `CompositeCurve` is a `curveMember`, which is also the parent of the `CompositeCurve`. So we may put a `CompositeCurve` inside a `CompositeCurve`.
 
@@ -26,14 +26,54 @@ npm install parse-gml-polygon
 ## Usage
 
 ```js
-todo
+const h = require('hyper-xml')
+const parse = require('parse-gml-polygon')
+
+const el = h('gml:Polygon', {'gml:id': 'some-id'}, [
+	h('gml:exterior', [
+		// triangle of 0|0 0|3 3|3
+		h('gml:LinearRing', [
+			h('gml:posList', ['0 0 0 3 3 3 0 0'])
+		])
+	]),
+	h('gml:interior', [
+		// triangle of 1|1 1|2 2|2
+		h('gml:LinearRing', [
+			h('gml:posList', ['1 1 1 2 2 2 1 1'])
+		])
+	])
+])
+
+const geometry = parse(el)
+console.log(geometry)
+```
+
+```js
+{
+	type: 'Polygon',
+	coordinates: [
+		[ // exterior/outer shape
+			[0, 0],
+			[0, 3],
+			[3, 3],
+			[0, 0]
+		],
+		[ // interior/inner shape
+			[1, 1],
+			[1, 2],
+			[2, 2],
+			[1, 1]
+		]
+	]
+}
 ```
 
 
 ## Unsupported encodings
 
 - `<gml:pointProperty xlink:href="#some-point-id"/>`
-- see [the tests](test.js)
+- `gml:coordinates`, which is deprecated
+- see `todo`s in [the tests](test.js)
 
 
 ## Contributing

@@ -120,7 +120,7 @@ const parseRing = (_) => {
 		points.push(...points2)
 	}
 
-	if (points.length === 0) throw new Error('gml:Ring must have > 0 points')
+	if (points.length < 4) throw new Error(_.name + ' must have >= 4 points')
 	return points
 }
 
@@ -177,6 +177,7 @@ Object.assign(parse, {
 	parseLinearRingOrLineString,
 	parseRing,
 	parseExteriorOrInterior,
-	parsePolygonOrRectangle
+	parsePolygonOrRectangle,
+	parseSurface
 })
 module.exports = parse
