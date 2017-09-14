@@ -3,9 +3,19 @@
 const test = require('tape')
 const h = require('hyper-xml')
 
-const {parse} = require('.')
+const parse = require('.')
 
-const coords = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]
+const coordsA = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]
+const coordsB = [[2, 2], [2, 4], [4, 4], [4, 2], [2, 2]]
+
+const simpleExterior = {
+	type: 'Polygon',
+	coordinates: [coordsA]
+}
+const multiExterior = {
+	type: 'MultiPolygon',
+	coordinates: [[coordsA], [coordsB]]
+}
 
 const posList = (coords) => {
 	return h('gml:posList', [coords.map(c => c.join(' ')).join(' ')])
@@ -23,11 +33,6 @@ const point5 = (coords) => {
 	})
 }
 
-const simpleExterior = {
-	type: 'Polygon',
-	coordinates: [coords]
-}
-
 // see http://erouault.blogspot.de/2014/04/gml-madness.html
 
 // todo: SimplePolygon > posList
@@ -36,7 +41,7 @@ const simpleExterior = {
 test('Polygon > exterior > LinearRing > posList', (t) => {
 	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
 		h('gml:exterior', [
-			h('gml:LinearRing', [posList(coords)])
+			h('gml:LinearRing', [posList(coordsA)])
 		])
 	])
 
@@ -47,7 +52,7 @@ test('Polygon > exterior > LinearRing > posList', (t) => {
 test('Polygon > exterior > LinearRing > pos*5', (t) => {
 	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
 		h('gml:exterior', [
-			h('gml:LinearRing', pos5(coords))
+			h('gml:LinearRing', pos5(coordsA))
 		])
 	])
 
@@ -58,7 +63,7 @@ test('Polygon > exterior > LinearRing > pos*5', (t) => {
 test('Polygon > exterior > LinearRing > Point*5 > pos', (t) => {
 	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
 		h('gml:exterior', [
-			h('gml:LinearRing', point5(coords))
+			h('gml:LinearRing', point5(coordsA))
 		])
 	])
 
@@ -69,7 +74,7 @@ test('Polygon > exterior > LinearRing > Point*5 > pos', (t) => {
 test('Rectangle > exterior > LinearRing > posList', (t) => {
 	const p = h('gml:Rectangle', [
 		h('gml:exterior', [
-			h('gml:LinearRing', [posList(coords)])
+			h('gml:LinearRing', [posList(coordsA)])
 		])
 	])
 
@@ -82,7 +87,7 @@ test('Polygon > exterior > Ring > curveMember > LineString > posList', (t) => {
 		h('gml:exterior', [
 			h('gml:Ring', [
 				h('gml:curveMember', [
-					h('gml:LineString', [posList(coords)])
+					h('gml:LineString', [posList(coordsA)])
 				])
 			])
 		])
@@ -97,7 +102,7 @@ test('Polygon > exterior > Ring > curveMember > LineString > pos*5', (t) => {
 		h('gml:exterior', [
 			h('gml:Ring', [
 				h('gml:curveMember', [
-					h('gml:LineString', pos5(coords))
+					h('gml:LineString', pos5(coordsA))
 				])
 			])
 		])
@@ -112,16 +117,16 @@ test('Polygon > exterior > Ring > curveMember*3 > LineString > posList', (t) => 
 		h('gml:exterior', [
 			h('gml:Ring', [
 				h('gml:curveMember', [
-					h('gml:LineString', [posList(coords.slice(0, 2))])
+					h('gml:LineString', [posList(coordsA.slice(0, 2))])
 				]),
 				h('gml:curveMember', [
-					h('gml:LineString', [posList(coords.slice(1, 3))])
+					h('gml:LineString', [posList(coordsA.slice(1, 3))])
 				]),
 				h('gml:curveMember', [
-					h('gml:LineString', [posList(coords.slice(2, 4))])
+					h('gml:LineString', [posList(coordsA.slice(2, 4))])
 				]),
 				h('gml:curveMember', [
-					h('gml:LineString', [posList(coords.slice(3))])
+					h('gml:LineString', [posList(coordsA.slice(3))])
 				])
 			])
 		])
@@ -132,8 +137,8 @@ test('Polygon > exterior > Ring > curveMember*3 > LineString > posList', (t) => 
 })
 
 test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringSegment > posList', (t) => {
-	const seg1 = h('gml:LineStringSegment', [posList(coords.slice(0, 3))])
-	const seg2 = h('gml:LineStringSegment', [posList(coords.slice(2))])
+	const seg1 = h('gml:LineStringSegment', [posList(coordsA.slice(0, 3))])
+	const seg2 = h('gml:LineStringSegment', [posList(coordsA.slice(2))])
 
 	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
 		h('gml:exterior', [
@@ -158,8 +163,8 @@ test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringS
 })
 
 test('Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*2 > posList', (t) => {
-	const seg1 = h('gml:LineStringSegment', [posList(coords.slice(0, 3))])
-	const seg2 = h('gml:LineStringSegment', [posList(coords.slice(2))])
+	const seg1 = h('gml:LineStringSegment', [posList(coordsA.slice(0, 3))])
+	const seg2 = h('gml:LineStringSegment', [posList(coordsA.slice(2))])
 
 	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
 		h('gml:exterior', [
@@ -178,9 +183,47 @@ test('Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSeg
 	t.end()
 })
 
+test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) => {
+	const p = h('gml:Surface', {'gml:id': 'some-id'}, [
+		h('gml:patches', [
+			h('gml:PolygonPatch', {'gml:id': 'a'}, [
+				h('gml:exterior', [
+					h('gml:LinearRing', [posList(coordsA)])
+				])
+			]),
+			h('gml:PolygonPatch', {'gml:id': 'b'}, [
+				h('gml:exterior', [
+					h('gml:LinearRing', [posList(coordsB)])
+				])
+			])
+		])
+	])
+
+	t.deepEqual(parse(p), multiExterior)
+	t.end()
+})
+
+test('Surface > patches > Rectangle > exterior > LinearRing > posList', (t) => {
+	const p = h('gml:Surface', {'gml:id': 'some-id'}, [
+		h('gml:patches', [
+			h('gml:Rectangle', {'gml:id': 'a'}, [
+				h('gml:exterior', [
+					h('gml:LinearRing', [posList(coordsA)])
+				])
+			]),
+			h('gml:Rectangle', {'gml:id': 'b'}, [
+				h('gml:exterior', [
+					h('gml:LinearRing', [posList(coordsB)])
+				])
+			])
+		])
+	])
+
+	t.deepEqual(parse(p), multiExterior)
+	t.end()
+})
+
 // todo: Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*4 > pointProperty*2 > Point > pos
 // todo: Polygon > exterior > Ring > curveMember > CompositeCurve > curveMember > LineString > posList
 // todo: Polygon > exterior > Ring > curveMember*2 > OrientableCurve > baseCurve > LineString > pos*3
-// todo: Surface > patches > PolygonPatch > exterior > LinearRingh > posList
-// todo: Surface > patches > Rectangle > exterior > LinearRing > posList
 // todo: CompositeSurface > surfaceMember > Surface > patches > …

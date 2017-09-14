@@ -124,11 +124,9 @@ const parseRing = (_) => {
 	return points
 }
 
-const parsePolygonOrRectangle = (_) => {
+const parsePolygonOrRectangle = (_) => { // or PolygonPatch
 	const exterior = findIn(_, 'gml:exterior')
-	if (!exterior) {
-		throw new Error(_.name + ' without gml:exterior is not supported')
-	}
+	if (!exterior) throw new Error('invalid ' + _.name + ' element')
 
 	let points = []
 
@@ -141,13 +139,37 @@ const parsePolygonOrRectangle = (_) => {
 		else throw new Error('invalid gml:exterior element')
 	}
 
-	return {type: 'Polygon', coordinates: [points]}
+	return [points]
 }
 
-module.exports = {
+const parseSurface = (_) => {
+	const patches = findIn(_, 'gml:patches')
+	if (!patches) throw new Error('invalid ' + _.name + ' element')
+
+	const polygons = []
+	for (let c of patches.children) {
+		if (c.name !== 'gml:PolygonPatch' && c.name !== 'gml:Rectangle') continue
+		polygons.push(parsePolygonOrRectangle(c))
+	}
+
+	if (polygons.length === 0) throw new Error(_.name + ' must have > 0 polygons')
+	return polygons
+}
+
+const parse = (_) => {
+	if (_.name === 'gml:Polygon' || _.name === 'gml:Rectangle') {
+		return {type: 'Polygon', coordinates: parsePolygonOrRectangle(_)}
+	} else if (_.name === 'gml:Surface') {
+		return {type: 'MultiPolygon', coordinates: parseSurface(_)}
+	}
+	return null // todo
+}
+
+Object.assign(parse, {
 	parsePosList,
 	parsePos,
 	parseLinearRingOrLineString,
 	parseRing,
 	parsePolygonOrRectangle
-}
+})
+module.exports = parse
