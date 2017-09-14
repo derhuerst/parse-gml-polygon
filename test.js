@@ -6,7 +6,8 @@ const h = require('hyper-xml')
 const parse = require('.')
 
 const coordsA = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]
-const coordsB = [[2, 2], [2, 4], [4, 4], [4, 2], [2, 2]]
+const coordsB = [[2, 2], [2, 5], [5, 5], [5, 2], [2, 2]]
+const coordsC = [[3, 3], [3, 4], [4, 4], [4, 3], [3, 3]] // fits into B
 
 const simpleExterior = {
 	type: 'Polygon',
@@ -15,6 +16,10 @@ const simpleExterior = {
 const multiExterior = {
 	type: 'MultiPolygon',
 	coordinates: [[coordsA], [coordsB]]
+}
+const withHole = {
+	type: 'Polygon',
+	coordinates: [coordsB, coordsC]
 }
 
 const posList = (coords) => {
@@ -220,6 +225,20 @@ test('Surface > patches > Rectangle > exterior > LinearRing > posList', (t) => {
 	])
 
 	t.deepEqual(parse(p), multiExterior)
+	t.end()
+})
+
+test('Polygon > exterior+interior > LinearRing > posList', (t) => {
+	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
+		h('gml:exterior', [
+			h('gml:LinearRing', [posList(coordsB)])
+		]),
+		h('gml:interior', [
+			h('gml:LinearRing', [posList(coordsC)])
+		])
+	])
+
+	t.deepEqual(parse(p), withHole)
 	t.end()
 })
 

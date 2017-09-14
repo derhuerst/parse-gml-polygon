@@ -124,22 +124,28 @@ const parseRing = (_) => {
 	return points
 }
 
+const parseExteriorOrInterior = (_) => {
+	const linearRing = findIn(_, 'gml:LinearRing')
+	if (linearRing) return parseLinearRingOrLineString(linearRing)
+
+	const ring = findIn(_, 'gml:Ring')
+	if (ring) return parseRing(ring)
+
+	throw new Error('invalid ' + _.name + ' element')
+}
+
 const parsePolygonOrRectangle = (_) => { // or PolygonPatch
 	const exterior = findIn(_, 'gml:exterior')
 	if (!exterior) throw new Error('invalid ' + _.name + ' element')
 
-	let points = []
+	const pointLists = [parseExteriorOrInterior(exterior)]
 
-	const linearRing = findIn(exterior, 'gml:LinearRing')
-	if (linearRing) {
-		points = parseLinearRingOrLineString(linearRing)
-	} else {
-		const ring = findIn(exterior, 'gml:Ring')
-		if (ring) points = parseRing(ring)
-		else throw new Error('invalid gml:exterior element')
+	for (let c of _.children) {
+		if (c.name !== 'gml:interior') continue
+		pointLists.push(parseExteriorOrInterior(c))
 	}
 
-	return [points]
+	return pointLists
 }
 
 const parseSurface = (_) => {
@@ -170,6 +176,7 @@ Object.assign(parse, {
 	parsePos,
 	parseLinearRingOrLineString,
 	parseRing,
+	parseExteriorOrInterior,
 	parsePolygonOrRectangle
 })
 module.exports = parse
