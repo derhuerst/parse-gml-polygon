@@ -131,8 +131,53 @@ test('Polygon > exterior > Ring > curveMember*3 > LineString > posList', (t) => 
 	t.end()
 })
 
-// todo: Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment > posList
-// todo: Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*4 > posList
+test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringSegment > posList', (t) => {
+	const seg1 = h('gml:LineStringSegment', [posList(coords.slice(0, 3))])
+	const seg2 = h('gml:LineStringSegment', [posList(coords.slice(2))])
+
+	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
+		h('gml:exterior', [
+			h('gml:Ring', [
+				h('gml:curveMember', [
+					h('gml:Curve', [
+						h('gml:segments', [seg1])
+					])
+				]),
+				h('gml:curveMember', [
+					h('gml:Curve', [
+						h('gml:segments', [seg2])
+					])
+				])
+			])
+		])
+	])
+	// console.error(require('util').inspect(p, {depth: Infinity}))
+
+	t.deepEqual(parse(p), simpleExterior)
+	t.end()
+})
+
+test('Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*2 > posList', (t) => {
+	const seg1 = h('gml:LineStringSegment', [posList(coords.slice(0, 3))])
+	const seg2 = h('gml:LineStringSegment', [posList(coords.slice(2))])
+
+	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
+		h('gml:exterior', [
+			h('gml:Ring', [
+				h('gml:curveMember', [
+					h('gml:Curve', [
+						h('gml:segments', [seg1, seg2])
+					])
+				])
+			])
+		])
+	])
+	// console.error(require('util').inspect(p, {depth: Infinity}))
+
+	t.deepEqual(parse(p), simpleExterior)
+	t.end()
+})
+
 // todo: Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*4 > pointProperty*2 > Point > pos
 // todo: Polygon > exterior > Ring > curveMember > CompositeCurve > curveMember > LineString > posList
 // todo: Polygon > exterior > Ring > curveMember*2 > OrientableCurve > baseCurve > LineString > pos*3

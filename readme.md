@@ -1,8 +1,14 @@
 # parse-gml-polygon
 
-**Convert a [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language) `Polygon` into [GeoJSON](http://geojson.org).**
+**Convert a [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language) `Polygon` into [GeoJSON](http://geojson.org).** Accepts the format of [`xml-flow`](https://www.npmjs.com/package/xml-flow) (with the `preserveMarkup` flag) as input. Works with a subset of [GML 3.3](https://portal.opengeospatial.org/files/?artifact_id=46568).
 
-Accepts the format of [`xml-flow`](https://www.npmjs.com/package/xml-flow) (with the `preserveMarkup` flag) as input. Works with a subset of [GML 3.3](https://portal.opengeospatial.org/files/?artifact_id=46568).
+**Parsing GML is a nightmare.** **This module tries to parse most of the mentioned ways to encode a polygon.** I don't intend to cover all of them though. To quote [the wonderful *GML madness* article by Even Rouault](http://erouault.blogspot.de/2014/04/gml-madness.html):
+
+> But, you may have noticed that the child of a `CompositeCurve` is a `curveMember`, which is also the parent of the `CompositeCurve`. So we may put a `CompositeCurve` inside a `CompositeCurve`.
+
+> […] or maybe you prefer to use `gml:surfaceMembers` (with a final `s`) instead of a `gml:surfaceMember` […]
+
+> To conclude, we should mention that the authors of the GML specification have admitted that encoding polygons was a bit too complicated.
 
 [![npm version](https://img.shields.io/npm/v/parse-gml-polygon.svg)](https://www.npmjs.com/package/parse-gml-polygon)
 [![build status](https://img.shields.io/travis/derhuerst/parse-gml-polygon.svg)](https://travis-ci.org/derhuerst/parse-gml-polygon)
@@ -22,6 +28,12 @@ npm install parse-gml-polygon
 ```js
 todo
 ```
+
+
+## Unsupported encodings
+
+- `<gml:pointProperty xlink:href="#some-point-id"/>`
+- see [the tests](test.js)
 
 
 ## Contributing

@@ -26,6 +26,17 @@ const textOf = (el) => {
 	return c && c.value || null
 }
 
+const findIn = (root, ...tags) => {
+	let el = root
+	for (let tag of tags) {
+		if (!el.children) return null
+		const child = el.children.find(c => c.name === tag)
+		if (!child) return null
+		el = child
+	}
+	return el
+}
+
 const parsePosList = (_) => {
 	const coords = textOf(_)
 	if (!coords) throw new Error('invalid gml:posList element')
@@ -42,15 +53,15 @@ const parsePos = (_) => {
 	return points
 }
 
-const parseLinearRingOrLineString = (_) => {
+const parseLinearRingOrLineString = (_) => { // or a LineStringSegment
 	let points = []
 
-	const posList = _.children.find(c => c.name === 'gml:posList')
+	const posList = findIn(_, 'gml:posList')
 	if (posList) points = parsePosList(posList)
 	else {
 		for (let c of _.children) {
 			if (c.name === 'gml:Point') {
-				const pos = c.children.find(c => c.name === 'gml:pos')
+				const pos = findIn(c, 'gml:pos')
 				if (!pos) continue
 				points.push(parsePos(pos)[0])
 			} else if (c.name === 'gml:pos') {
@@ -63,18 +74,43 @@ const parseLinearRingOrLineString = (_) => {
 	return points
 }
 
+const parseCurveSegments = (_) => {
+	let points = []
+
+	for (let c of _.children) {
+		if (c.name !== 'gml:LineStringSegment') continue
+		const points2 = parseLinearRingOrLineString(c)
+
+		// remove overlapping
+		const end = points[points.length - 1]
+		const start = points2[0]
+		if (end && start && deepStrictEqual(end, start)) points2.shift()
+
+		points.push(...points2)
+	}
+
+	if (points.length === 0) {
+		throw new Error('gml:Curve > gml:segments must have > 0 points')
+	}
+	return points
+}
+
 const parseRing = (_) => {
 	const points = []
 
 	for (let c of _.children) {
 		if (c.name !== 'gml:curveMember') continue
+		let points2
 
-		const lineString = c.children.find(c => c.name === 'gml:LineString')
-		if (!lineString) {
-			throw new Error(c.name + ' without gml:LineString is not supported')
+		const lineString = findIn(c, 'gml:LineString')
+		if (lineString) {
+			points2 = parseLinearRingOrLineString(lineString)
+		} else {
+			const segments = findIn(c, 'gml:Curve', 'gml:segments')
+			if (!segments) throw new Error('invalid ' + c.name + ' element')
+
+			points2 = parseCurveSegments(segments)
 		}
-
-		const points2 = parseLinearRingOrLineString(lineString)
 
 		// remove overlapping
 		const end = points[points.length - 1]
@@ -89,21 +125,20 @@ const parseRing = (_) => {
 }
 
 const parsePolygonOrRectangle = (_) => {
-	const exterior = _.children.find(c => c.name === 'gml:exterior')
+	const exterior = findIn(_, 'gml:exterior')
 	if (!exterior) {
 		throw new Error(_.name + ' without gml:exterior is not supported')
 	}
 
 	let points = []
 
-	const linearRing = exterior.children.find(c => c.name === 'gml:LinearRing')
+	const linearRing = findIn(exterior, 'gml:LinearRing')
 	if (linearRing) {
 		points = parseLinearRingOrLineString(linearRing)
 	} else {
-		const ring = exterior.children.find(c => c.name === 'gml:Ring')
-		if (ring) {
-			points = parseRing(ring)
-		} else throw new Error('invalid gml:exterior element')
+		const ring = findIn(exterior, 'gml:Ring')
+		if (ring) points = parseRing(ring)
+		else throw new Error('invalid gml:exterior element')
 	}
 
 	return {type: 'Polygon', coordinates: [points]}
