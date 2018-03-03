@@ -208,7 +208,7 @@ const parseMultiSurface = (_, transformCoords, stride = 2) => {
 	return polygons
 }
 
-const noTransform = (x, y) => [x, y]
+const noTransform = (...coords) => coords
 
 const parse = (_, transformCoords = noTransfor, stride = 2) => {
 	if (_.name === 'gml:Polygon' || _.name === 'gml:Rectangle') {
