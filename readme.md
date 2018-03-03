@@ -14,6 +14,7 @@
 [![build status](https://img.shields.io/travis/derhuerst/parse-gml-polygon.svg)](https://travis-ci.org/derhuerst/parse-gml-polygon)
 ![ISC-licensed](https://img.shields.io/github/license/derhuerst/parse-gml-polygon.svg)
 [![chat on gitter](https://badges.gitter.im/derhuerst.svg)](https://gitter.im/derhuerst)
+[![support me on Patreon](https://img.shields.io/badge/support%20me-on%20patreon-fa7664.svg)](https://patreon.com/derhuerst)
 
 
 ## Installing

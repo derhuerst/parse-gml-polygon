@@ -164,6 +164,23 @@ const parseSurface = (_, transformCoords) => {
 	return polygons
 }
 
+const parseCompositeSurface = (_, transformCoords) => {
+	const polygons = []
+	for (let c of _.children) {
+		if (c.name === 'gml:surfaceMember') {
+			const c2 = c.children[0]
+			if (c2.name === 'gml:Surface') {
+				polygons.push(...parseSurface(c2, transformCoords))
+			} else if (c2.name === 'gml:Polygon') {
+				polygons.push(parsePolygonOrRectangle(c2, transformCoords))
+			}
+		}
+	}
+
+	if (polygons.length === 0) throw new Error(_.name + ' must have > 0 polygons')
+	return polygons
+}
+
 const parseMultiSurface = (_, transformCoords) => {
 	let el = _
 
@@ -177,7 +194,9 @@ const parseMultiSurface = (_, transformCoords) => {
 			polygons.push(...polygons2)
 		} else if (c.name === 'gml:surfaceMember') {
 			const c2 = c.children[0]
-			if (c2.name === 'gml:Surface') {
+			if (c2.name === 'gml:CompositeSurface') {
+				polygons.push(...parseCompositeSurface(c2, transformCoords))
+			} else if (c2.name === 'gml:Surface') {
 				polygons.push(...parseSurface(c2, transformCoords))
 			} else if (c2.name === 'gml:Polygon') {
 				polygons.push(parsePolygonOrRectangle(c2, transformCoords))
@@ -219,6 +238,7 @@ Object.assign(parse, {
 	parseExteriorOrInterior,
 	parsePolygonOrRectangle,
 	parseSurface,
+	parseCompositeSurface,
 	parseMultiSurface
 })
 module.exports = parse
