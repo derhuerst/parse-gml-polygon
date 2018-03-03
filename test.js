@@ -49,7 +49,7 @@ const point5 = (coords) => {
 	})
 }
 
-const transformCoords = (x, y) => [x * 10, y * 10]
+const transformCoords = (...vals) => vals.map(val => val * 10)
 
 // see http://erouault.blogspot.de/2014/04/gml-madness.html
 
@@ -327,7 +327,30 @@ test('Polygon > exterior+interior > LinearRing > posList', (t) => {
 	t.end()
 })
 
+test('stride === 3', (t) => {
+	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
+		h('gml:exterior', [
+			h('gml:LinearRing', [
+				h('gml:posList', [[
+					1, 1, 0,
+					1, 2, 0,
+					2, 2, 0
+				].join(' ')])
+			])
+		])
+	])
+
+	t.deepEqual(parse(p, transformCoords, 3), {
+		type: 'Polygon',
+		coordinates: [[
+			[10, 10, 0],
+			[10, 20, 0],
+			[20, 20, 0]
+		]]
+	})
+	t.end()
+})
+
 // todo: Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*4 > pointProperty*2 > Point > pos
 // todo: Polygon > exterior > Ring > curveMember > CompositeCurve > curveMember > LineString > posList
 // todo: Polygon > exterior > Ring > curveMember*2 > OrientableCurve > baseCurve > LineString > pos*3
-// todo: CompositeSurface > surfaceMember > Surface > patches > …
