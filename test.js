@@ -351,6 +351,41 @@ test('stride === 3', (t) => {
 	t.end()
 })
 
+test('posList with srsDimension of 3', (t) => {
+	const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
+		h('gml:exterior', [
+			h('gml:LinearRing', [
+				h('gml:posList', {srsDimension: '3'}, [[
+					1, 1, 4,
+					1, 2, 4,
+					2, 2, 4
+				].join(' ')])
+			])
+		]),
+		h('gml:interior', [
+			h('gml:LinearRing', [
+				h('gml:pos', {srsDimension: '3'}, [[1, 1, 5].join(' ')]),
+				h('gml:pos', {srsDimension: '3'}, [[1, 2, 5].join(' ')]),
+				h('gml:pos', {srsDimension: '3'}, [[2, 2, 5].join(' ')])
+			])
+		])
+	])
+
+	t.deepEqual(parse(p), {
+		type: 'Polygon',
+		coordinates: [[
+			[1, 1, 4],
+			[1, 2, 4],
+			[2, 2, 4]
+		], [
+			[1, 1, 5],
+			[1, 2, 5],
+			[2, 2, 5]
+		]]
+	})
+	t.end()
+})
+
 // todo: Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*4 > pointProperty*2 > Point > pos
 // todo: Polygon > exterior > Ring > curveMember > CompositeCurve > curveMember > LineString > posList
 // todo: Polygon > exterior > Ring > curveMember*2 > OrientableCurve > baseCurve > LineString > pos*3

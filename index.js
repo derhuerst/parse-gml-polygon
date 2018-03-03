@@ -39,6 +39,11 @@ const parsePosList = (_, transformCoords, stride = 2) => {
 	const coords = textOf(_)
 	if (!coords) throw new Error('invalid gml:posList element')
 
+	const dimensions = _.attributes && _.attributes.srsDimension
+	if (dimensions) {
+		stride = parseInt(dimensions)
+		if (Number.isNaN(stride)) throw new Error('invalid posList:srsDimension attribute')
+	}
 	return parseCoords(coords, transformCoords, stride)
 }
 
@@ -46,6 +51,11 @@ const parsePos = (_, transformCoords, stride = 2) => {
 	const coords = textOf(_)
 	if (!coords) throw new Error('invalid gml:pos element')
 
+	const dimensions = _.attributes && _.attributes.srsDimension
+	if (dimensions) {
+		stride = parseInt(dimensions)
+		if (Number.isNaN(stride)) throw new Error('invalid posList:srsDimension attribute')
+	}
 	const points = parseCoords(coords, transformCoords, stride)
 	if (points.length !== 1) throw new Error('gml:pos must have 1 point')
 	return points[0]
@@ -210,7 +220,7 @@ const parseMultiSurface = (_, transformCoords, stride = 2) => {
 
 const noTransform = (...coords) => coords
 
-const parse = (_, transformCoords = noTransfor, stride = 2) => {
+const parse = (_, transformCoords = noTransform, stride = 2) => {
 	if (_.name === 'gml:Polygon' || _.name === 'gml:Rectangle') {
 		return {
 			type: 'Polygon',
