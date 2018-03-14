@@ -3,7 +3,7 @@
 const deepStrictEqual = require('deep-strict-equal')
 
 const parseCoords = (s, transformCoords, stride = 2) => {
-	const coords = s.split(' ')
+	const coords = s.replace(/\s+/g, ' ').trim().split(' ')
 	if (coords.length === 0 || (coords.length % stride) !== 0) {
 		console.error(coords) // todo
 		throw new Error(`invalid coordinates list (stride ${stride})`)
