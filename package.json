@@ -1,7 +1,7 @@
 {
 	"name": "parse-gml-polygon",
 	"description": "Convert a GML Polygon into GeoJSON.",
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"main": "index.js",
 	"files": [
 		"index.js"
@@ -32,6 +32,7 @@
 		"prepublishOnly": "npm test"
 	},
 	"dependencies": {
+		"@turf/rewind": "^5.1.5",
 		"deep-strict-equal": "^0.2.0"
 	}
 }

@@ -2,6 +2,7 @@
 
 const test = require('tape')
 const h = require('hyper-xml')
+const rewind = require('@turf/rewind')
 
 const parse = require('.')
 
@@ -9,13 +10,13 @@ const coordsA = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]
 const coordsB = [[2, 2], [2, 5], [5, 5], [5, 2], [2, 2]]
 const coordsC = [[3, 3], [3, 4], [4, 4], [4, 3], [3, 3]] // fits into B
 
-const simpleExterior = {
+const simpleExterior = rewind({
 	type: 'Polygon',
 	coordinates: [
 		[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]
 	]
-}
-const multiExterior = {
+})
+const multiExterior = rewind({
 	type: 'MultiPolygon',
 	coordinates: [
 		[
@@ -24,14 +25,14 @@ const multiExterior = {
 			[[20, 20], [20, 50], [50, 50], [50, 20], [20, 20]]
 		]
 	]
-}
-const withHole = {
+})
+const withHole = rewind({
 	type: 'Polygon',
 	coordinates: [
 		[[20, 20], [20, 50], [50, 50], [50, 20], [20, 20]],
 		[[30, 30], [30, 40], [40, 40], [40, 30], [30, 30]]
 	]
-}
+})
 
 const posList = (coords) => {
 	return h('gml:posList', [coords.map(c => c.join(' ')).join(' ')])
@@ -340,14 +341,14 @@ test('stride === 3', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords, 3), {
+	t.deepEqual(parse(p, transformCoords, 3), rewind({
 		type: 'Polygon',
 		coordinates: [[
 			[10, 10, 0],
 			[10, 20, 0],
 			[20, 20, 0]
 		]]
-	})
+	}))
 	t.end()
 })
 
@@ -371,7 +372,7 @@ test('posList with srsDimension of 3', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p), {
+	t.deepEqual(parse(p), rewind({
 		type: 'Polygon',
 		coordinates: [[
 			[1, 1, 4],
@@ -382,7 +383,7 @@ test('posList with srsDimension of 3', (t) => {
 			[1, 2, 5],
 			[2, 2, 5]
 		]]
-	})
+	}))
 	t.end()
 })
 

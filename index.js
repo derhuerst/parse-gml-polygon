@@ -1,6 +1,7 @@
 'use strict'
 
 const deepStrictEqual = require('deep-strict-equal')
+const rewind = require('@turf/rewind')
 
 const parseCoords = (s, transformCoords, stride = 2) => {
 	const coords = s.replace(/\s+/g, ' ').trim().split(' ')
@@ -222,20 +223,20 @@ const noTransform = (...coords) => coords
 
 const parse = (_, transformCoords = noTransform, stride = 2) => {
 	if (_.name === 'gml:Polygon' || _.name === 'gml:Rectangle') {
-		return {
+		return rewind({
 			type: 'Polygon',
 			coordinates: parsePolygonOrRectangle(_, transformCoords, stride)
-		}
+		})
 	} else if (_.name === 'gml:Surface') {
-		return {
+		return rewind({
 			type: 'MultiPolygon',
 			coordinates: parseSurface(_, transformCoords, stride)
-		}
+		})
 	} else if (_.name === 'gml:MultiSurface') {
-		return {
+		return rewind({
 			type: 'MultiPolygon',
 			coordinates: parseMultiSurface(_, transformCoords, stride)
-		}
+		})
 	}
 	return null // todo
 }
