@@ -76,9 +76,9 @@ This library consumes a tree structure corresponding to XML. [`xml-reader`](http
 
 Look at these code examples to understand how to use `parse-gml-polygon`:
 
-- from an XML/GML string: [`example/xml-string.js`](example/xml-string.js)
-- from an XML/GML file: [`example/xml-file.js`](example/xml-file.js)
-- creating a tree manually: [`example/hyper-xml.js`](example/hyper-xml.js)
+- from an XML/GML string: [`examples/xml-string.js`](examples/xml-string.js)
+- from an XML/GML file: [`examples/xml-file.js`](examples/xml-file.js)
+- creating a tree manually: [`examples/hyper-xml.js`](examples/hyper-xml.js)
 
 
 ## API
