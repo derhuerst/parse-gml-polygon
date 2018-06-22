@@ -1,8 +1,7 @@
 'use strict'
 
 const h = require('hyper-xml')
-
-const parse = require('.')
+const parsePolygon = require('..')
 
 const el = h('gml:Polygon', {'gml:id': 'some-id'}, [
 	h('gml:exterior', [
@@ -18,4 +17,4 @@ const el = h('gml:Polygon', {'gml:id': 'some-id'}, [
 		])
 	])
 ])
-console.log(parse(el))
+console.log(parsePolygon(el))

@@ -25,7 +25,8 @@
 	"devDependencies": {
 		"hyper-xml": "^0.1.1",
 		"tap-min": "^1.2.1",
-		"tape": "^4.6.3"
+		"tape": "^4.6.3",
+		"xml-reader": "^2.4.3"
 	},
 	"scripts": {
 		"test": "node test.js | tap-min",

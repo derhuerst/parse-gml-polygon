@@ -24,7 +24,7 @@ npm install parse-gml-polygon
 ```
 
 
-## Usage
+## Example
 
 ```js
 const h = require('hyper-xml')
@@ -69,7 +69,25 @@ console.log(geometry)
 }
 ```
 
-You may optionally pass in a function to transform coordinates. The default transform is `(x, y) => [x, y]`.
+
+## Usage
+
+This library consumes a tree structure corresponding to XML. [`xml-reader`](https://www.npmjs.com/package/xml-reader) parses XML into these structures. With [`hyper-xml`](https://npmjs.com/package/hyper-xml), you can create them manually.
+
+Look at these code examples to understand how to use `parse-gml-polygon`:
+
+- from an XML/GML string: [`example/xml-string.js`](example/xml-string.js)
+- creating a tree manually: [`example/hyper-xml.js`](example/hyper-xml.js)
+
+
+## API
+
+```js
+parseGmlPolygon(tree, transformCoords = noTransform, stride = 2) => GeoJSON
+```
+
+- You may optionally pass in a `transformCoords` function, e.g. to translate them into WGS84. The default transform is `(x, y) => [x, y]`.
+- `stride` specifies the number of values that each point in the polygon has. A `stride` of `3` would correspond to a polygon in a 3D coordinate system.
 
 
 ## Unsupported encodings
