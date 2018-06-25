@@ -8,11 +8,6 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 # Use tabs in JavaScript and JSON.
-[**.{js, json}]
-indent_style = tab
-indent_size = 4
-
-# Use spaces in YAML.
-[**.{yml,yaml}]
+[**.{js, json, yml, yaml}]
 indent_style = spaces
 indent_size = 2
