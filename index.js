@@ -45,16 +45,19 @@ const findIn = (root, ...tags) => {
 
 const createChildContext = (_, opts, ctx) => {
 	const srsDimensionAttribute = _.attributes && _.attributes.srsDimension
+
 	if (srsDimensionAttribute) {
 		const srsDimension = parseInt(srsDimensionAttribute)
-		if (Number.isNaN(srsDimension) || srsDimension <= 0) throw new Error(`invalid srsDimension attribute value "${srsDimensionAttribute}", expected a positive integer`)
+		if (Number.isNaN(srsDimension) || srsDimension <= 0) {
+			throw new Error(`invalid srsDimension attribute value "${srsDimensionAttribute}", expected a positive integer`)
+		}
 
 		const childCtx = Object.create(ctx)
 		childCtx.srsDimension = srsDimension
 		return childCtx;
-	} else {
-		return ctx;
 	}
+
+	return ctx;
 }
 
 const parsePosList = (_, opts, ctx = {}) => {
