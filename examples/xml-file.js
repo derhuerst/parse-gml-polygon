@@ -15,11 +15,11 @@ const parser = xmlReader.create({
   // stream: true
 })
 sink(reader)
-	.then(data => parser.parse(data))
-	.catch((err) => {
-	  console.error(err)
-	  process.exit(1)
-	})
+  .then(data => parser.parse(data))
+  .catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
 
 parser.once('tag:gml:Polygon', (data) => {
   const parsed = parsePolygon(data)
