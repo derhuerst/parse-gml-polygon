@@ -50,7 +50,7 @@ const point5 = (coords) => {
 	})
 }
 
-const transformCoords = (...vals) => vals.map(val => val * 10)
+const scaleByTen = (...vals) => vals.map(val => val * 10)
 
 // see http://erouault.blogspot.de/2014/04/gml-madness.html
 
@@ -64,7 +64,7 @@ test('Polygon > exterior > LinearRing > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -75,7 +75,7 @@ test('Polygon > exterior > LinearRing > pos*5', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -86,7 +86,7 @@ test('Polygon > exterior > LinearRing > Point*5 > pos', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -97,7 +97,7 @@ test('Rectangle > exterior > LinearRing > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -112,7 +112,7 @@ test('Polygon > exterior > Ring > curveMember > LineString > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -127,7 +127,7 @@ test('Polygon > exterior > Ring > curveMember > LineString > pos*5', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -151,7 +151,7 @@ test('Polygon > exterior > Ring > curveMember*3 > LineString > posList', (t) => 
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -177,7 +177,7 @@ test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringS
 	])
 	// console.error(require('util').inspect(p, {depth: Infinity}))
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -198,7 +198,7 @@ test('Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSeg
 	])
 	// console.error(require('util').inspect(p, {depth: Infinity}))
 
-	t.deepEqual(parse(p, transformCoords), simpleExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), simpleExterior)
 	t.end()
 })
 
@@ -218,7 +218,7 @@ test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) =
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), multiExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), multiExterior)
 	t.end()
 })
 
@@ -238,7 +238,7 @@ test('Surface > patches > Rectangle*2 > exterior > LinearRing > posList', (t) =>
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), multiExterior)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), multiExterior)
 	t.end()
 })
 
@@ -266,7 +266,7 @@ test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t)
 		h('gml:surfaceMember', [s2])
 	])
 
-	t.deepEqual(parse(m, transformCoords), multiExterior)
+	t.deepEqual(parse(m, {transformCoords : scaleByTen}), multiExterior)
 	t.end()
 })
 
@@ -286,7 +286,7 @@ test('MultiSurface > surfaceMember*2 > Polygon > …', (t) => {
 		h('gml:surfaceMember', [p2])
 	])
 
-	t.deepEqual(parse(m, transformCoords), multiExterior)
+	t.deepEqual(parse(m, {transformCoords : scaleByTen}), multiExterior)
 	t.end()
 })
 
@@ -310,7 +310,7 @@ test('MultiSurface > surfaceMember > CompositeSurface > surfaceMember > Polygon 
 		])
 	])
 
-	t.deepEqual(parse(m, transformCoords), multiExterior)
+	t.deepEqual(parse(m, {transformCoords : scaleByTen}), multiExterior)
 	t.end()
 })
 
@@ -324,7 +324,7 @@ test('Polygon > exterior+interior > LinearRing > posList', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords), withHole)
+	t.deepEqual(parse(p, {transformCoords : scaleByTen}), withHole)
 	t.end()
 })
 
@@ -341,7 +341,7 @@ test('stride === 3', (t) => {
 		])
 	])
 
-	t.deepEqual(parse(p, transformCoords, 3), rewind({
+	t.deepEqual(parse(p, { transformCoords: scaleByTen, stride: 3 }), rewind({
 		type: 'Polygon',
 		coordinates: [[
 			[10, 10, 0],
@@ -386,6 +386,33 @@ test('posList with srsDimension of 3', (t) => {
 	}))
 	t.end()
 })
+
+test('posList with invalid srsDimension of "three"', (t) => {
+	const p = h('gml:Polygon', [
+		h('gml:exterior', [
+			h('gml:LinearRing', [
+				h('gml:posList', {srsDimension: 'three'})
+			])
+		])
+	])
+
+	t.throws(()=>(parse(p), /invalid srsDimension attribute value "three", expected a positive integer/))
+	t.end()
+})
+
+test('posList with invalid srsDimension of "-3"', (t) => {
+	const p = h('gml:Polygon', [
+		h('gml:exterior', [
+			h('gml:LinearRing', [
+				h('gml:posList', {srsDimension: '-3'})
+			])
+		])
+	])
+
+	t.throws(()=>(parse(p), /invalid srsDimension attribute value "-3", expected a positive integer/))
+	t.end()
+})
+
 
 // todo: Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSegment*4 > pointProperty*2 > Point > pos
 // todo: Polygon > exterior > Ring > curveMember > CompositeCurve > curveMember > LineString > posList
