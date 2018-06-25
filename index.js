@@ -12,7 +12,6 @@ const parseCoords = (s, opts = {transformCoords: noTransform, stride: 2}, ctx = 
   const coords = s.replace(/\s+/g, ' ').trim().split(' ')
 
   if (coords.length === 0 || (coords.length % stride) !== 0) {
-    console.error(coords) // todo
     throw new Error(`invalid coordinates list (stride ${stride})`)
   }
 

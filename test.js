@@ -391,12 +391,13 @@ test('posList with invalid srsDimension of "three"', (t) => {
   const p = h('gml:Polygon', [
     h('gml:exterior', [
       h('gml:LinearRing', [
-        h('gml:posList', {srsDimension: 'three'})
+        h('gml:posList', {srsDimension: 'three'}, '0 0 0 1 1 1 0 0 0')
       ])
     ])
   ])
 
-  t.throws((() => parse(p), /invalid srsDimension attribute value "three", expected a positive integer/))
+  const msg = /invalid srsDimension attribute value "three", expected a positive integer/
+  t.throws(() => parse(p), msg)
   t.end()
 })
 
@@ -404,12 +405,13 @@ test('posList with invalid srsDimension of "-3"', (t) => {
   const p = h('gml:Polygon', [
     h('gml:exterior', [
       h('gml:LinearRing', [
-        h('gml:posList', {srsDimension: '-3'})
+        h('gml:posList', {srsDimension: '-3'}, '0 0 0 1 1 1 0 0 0')
       ])
     ])
   ])
 
-  t.throws((() => parse(p), /invalid srsDimension attribute value "-3", expected a positive integer/))
+  const msg = /invalid srsDimension attribute value "-3", expected a positive integer/
+  t.throws(() => parse(p), msg)
   t.end()
 })
 
