@@ -14,7 +14,6 @@
 		"convert",
 		"gis"
 	],
-	"author": "Jannis R <mail@jannisr.de>",
 	"homepage": "https://github.com/derhuerst/parse-gml-polygon",
 	"repository": "derhuerst/parse-gml-polygon",
 	"bugs": "https://github.com/derhuerst/parse-gml-polygon/issues",
