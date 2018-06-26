@@ -84,11 +84,15 @@ Look at these code examples to understand how to use `parse-gml-polygon`:
 ## API
 
 ```js
-parseGmlPolygon(tree, transformCoords = noTransform, stride = 2) => GeoJSON
+parseGmlPolygon(tree, { transformCoords: noTransform, stride: 2}) => GeoJSON
 ```
 
+Second argument is a map of options:
+
 - You may optionally pass in a `transformCoords` function, e.g. to translate them into WGS84. The default transform is `(x, y) => [x, y]`.
-- `stride` specifies the number of values that each point in the polygon has. A `stride` of `3` would correspond to a polygon in a 3D coordinate system.
+- `stride` specifies the default number of values that each point in the polygon has. A `stride` of `3` would correspond to a polygon in a 3D coordinate system.  
+Please note that this value can be overridden by the `srsDimension` attribute.  
+Default value of `stride` is `2`.
 
 
 ## Unsupported encodings
