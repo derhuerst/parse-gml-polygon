@@ -59,36 +59,39 @@ const createChildContext = (_, opts, ctx) => {
 }
 
 const parsePosList = (_, opts, ctx = {}) => {
+  const childCtx = createChildContext(_, opts, ctx)
+
   const coords = textOf(_)
   if (!coords) throw new Error('invalid gml:posList element')
 
-  const childCtx = createChildContext(_, opts, ctx)
   return parseCoords(coords, opts, childCtx)
 }
 
 const parsePos = (_, opts, ctx = {}) => {
+  const childCtx = createChildContext(_, opts, ctx)
+
   const coords = textOf(_)
   if (!coords) throw new Error('invalid gml:pos element')
 
-  const childCtx = createChildContext(_, opts, ctx)
   const points = parseCoords(coords, opts, childCtx)
   if (points.length !== 1) throw new Error('gml:pos must have 1 point')
   return points[0]
 }
 
 const parseLinearRingOrLineString = (_, opts, ctx = {}) => { // or a LineStringSegment
-  let points = []
-
   const childCtx = createChildContext(_, opts, ctx)
+
+  let points = []
 
   const posList = findIn(_, 'gml:posList')
   if (posList) points = parsePosList(posList, opts, childCtx)
   else {
     for (let c of _.children) {
       if (c.name === 'gml:Point') {
+        const grandChildCtx = createChildContext(c, opts, childCtx)
         const pos = findIn(c, 'gml:pos')
         if (!pos) continue
-        points.push(parsePos(pos, opts, childCtx))
+        points.push(parsePos(pos, opts, grandChildCtx))
       } else if (c.name === 'gml:pos') {
         points.push(parsePos(c, opts, childCtx))
       }
@@ -121,6 +124,8 @@ const parseCurveSegments = (_, opts, ctx = {}) => {
 }
 
 const parseRing = (_, opts, ctx = {}) => {
+  const childCtx = createChildContext(_, opts, ctx)
+
   const points = []
 
   for (let c of _.children) {
@@ -129,12 +134,12 @@ const parseRing = (_, opts, ctx = {}) => {
 
     const lineString = findIn(c, 'gml:LineString')
     if (lineString) {
-      points2 = parseLinearRingOrLineString(lineString, opts, ctx)
+      points2 = parseLinearRingOrLineString(lineString, opts, childCtx)
     } else {
       const segments = findIn(c, 'gml:Curve', 'gml:segments')
       if (!segments) throw new Error('invalid ' + c.name + ' element')
 
-      points2 = parseCurveSegments(segments, opts, ctx)
+      points2 = parseCurveSegments(segments, opts, childCtx)
     }
 
     // remove overlapping
