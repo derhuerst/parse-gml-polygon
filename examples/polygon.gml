@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gml:Polygon gml:id="some-id">
+<gml:Polygon gml:id="some-id" xmlns:gml="http://www.opengis.net/gml">
 	<gml:exterior>
 		<gml:LinearRing>
 			<gml:posList>0 0 0 3 3 3 0 0</gml:posList>
