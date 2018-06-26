@@ -247,7 +247,6 @@ const parseMultiSurface = (_, opts, ctx = {}) => {
 }
 
 const parse = (_, opts = { transformCoords: noTransform, stride: 2 }, ctx = {}) => {
-
   const childCtx = createChildContext(_, opts, ctx)
 
   if (_.name === 'gml:Polygon' || _.name === 'gml:Rectangle') {

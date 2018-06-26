@@ -217,7 +217,7 @@ test('Polygon > exterior > LinearRing > posList [@srsDimension = 3]', (t) => {
   const p = h('gml:Polygon', [
     h('gml:exterior', [
       h('gml:LinearRing', [
-        h('gml:posList', { 'srsDimension': '3'}, '1 1 0 1 2 0 2 2 0')
+        h('gml:posList', {'srsDimension': '3'}, '1 1 0 1 2 0 2 2 0')
       ])
     ])
   ])
@@ -236,7 +236,7 @@ test('Polygon > exterior > LinearRing > posList [@srsDimension = 3]', (t) => {
 test('Polygon > exterior > LinearRing [@srsDimension = 3] > posList', (t) => {
   const p = h('gml:Polygon', [
     h('gml:exterior', [
-      h('gml:LinearRing', { 'srsDimension': '3'}, [
+      h('gml:LinearRing', {'srsDimension': '3'}, [
         h('gml:posList', '1 1 0 1 2 0 2 2 0')
       ])
     ])
@@ -254,7 +254,7 @@ test('Polygon > exterior > LinearRing [@srsDimension = 3] > posList', (t) => {
 })
 
 test('Polygon [@srsDimension = 3] > exterior > LinearRing > posList', (t) => {
-  const p = h('gml:Polygon', { 'srsDimension': '3'}, [
+  const p = h('gml:Polygon', {'srsDimension': '3'}, [
     h('gml:exterior', [
       h('gml:LinearRing', [
         h('gml:posList', '1 1 0 1 2 0 2 2 0')
@@ -328,7 +328,6 @@ test('Surface > patches > Rectangle*2 > exterior > LinearRing > posList', (t) =>
 })
 
 test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) => {
-
   const p = h('gml:Surface', {'gml:id': 'some-id', 'srsDimension': '3'}, [
     h('gml:patches', [
       h('gml:PolygonPatch', {'gml:id': 'a'}, [
@@ -347,7 +346,6 @@ test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) =
   t.deepEqual(parse(p, {transformCoords: scaleByTen}), multiExterior2D3D)
   t.end()
 })
-
 
 test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t) => {
   const s1 = h('gml:Surface', {'gml:id': 's1'}, [
@@ -378,7 +376,7 @@ test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t)
 })
 
 test('MultiSurface [ @srsDimension = 3 ] > surfaceMember*2 > Surface > patches > Rectangle > …', (t) => {
-  const s1 = h('gml:Surface', {'gml:id': 's1', 'srsDimension': '2' }, [
+  const s1 = h('gml:Surface', {'gml:id': 's1', 'srsDimension': '2'}, [
     h('gml:patches', [
       h('gml:Rectangle', [
         h('gml:exterior', [
@@ -387,7 +385,7 @@ test('MultiSurface [ @srsDimension = 3 ] > surfaceMember*2 > Surface > patches >
       ])
     ])
   ])
-  const s2 = h('gml:Surface', {'gml:id': 's2' }, [
+  const s2 = h('gml:Surface', {'gml:id': 's2'}, [
     h('gml:patches', [
       h('gml:Rectangle', [
         h('gml:exterior', [
@@ -396,7 +394,7 @@ test('MultiSurface [ @srsDimension = 3 ] > surfaceMember*2 > Surface > patches >
       ])
     ])
   ])
-  const m = h('gml:MultiSurface', {'gml:id': 'm', 'srsDimension' : '3'}, [
+  const m = h('gml:MultiSurface', {'gml:id': 'm', 'srsDimension': '3'}, [
     h('gml:surfaceMember', [s1]),
     h('gml:surfaceMember', [s2])
   ])
@@ -404,7 +402,6 @@ test('MultiSurface [ @srsDimension = 3 ] > surfaceMember*2 > Surface > patches >
   t.deepEqual(parse(m, {transformCoords: scaleByTen}), multiExterior2D3D)
   t.end()
 })
-
 
 test('MultiSurface > surfaceMember*2 > Polygon > …', (t) => {
   const p1 = h('gml:Polygon', {'gml:id': 'p1'}, [
