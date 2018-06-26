@@ -79,16 +79,18 @@ const parsePos = (_, opts, ctx = {}) => {
 const parseLinearRingOrLineString = (_, opts, ctx = {}) => { // or a LineStringSegment
   let points = []
 
+  const childCtx = createChildContext(_, opts, ctx)
+
   const posList = findIn(_, 'gml:posList')
-  if (posList) points = parsePosList(posList, opts, ctx)
+  if (posList) points = parsePosList(posList, opts, childCtx)
   else {
     for (let c of _.children) {
       if (c.name === 'gml:Point') {
         const pos = findIn(c, 'gml:pos')
         if (!pos) continue
-        points.push(parsePos(pos, opts, ctx))
+        points.push(parsePos(pos, opts, childCtx))
       } else if (c.name === 'gml:pos') {
-        points.push(parsePos(c, opts, ctx))
+        points.push(parsePos(c, opts, childCtx))
       }
     }
   }
@@ -234,15 +236,18 @@ const parseMultiSurface = (_, opts, ctx = {}) => {
 }
 
 const parse = (_, opts = { transformCoords: noTransform, stride: 2 }, ctx = {}) => {
+
+  const childCtx = createChildContext(_, opts, ctx)
+
   if (_.name === 'gml:Polygon' || _.name === 'gml:Rectangle') {
     return rewind({
       type: 'Polygon',
-      coordinates: parsePolygonOrRectangle(_, opts, ctx)
+      coordinates: parsePolygonOrRectangle(_, opts, childCtx)
     })
   } else if (_.name === 'gml:Surface') {
     return rewind({
       type: 'MultiPolygon',
-      coordinates: parseSurface(_, opts, ctx)
+      coordinates: parseSurface(_, opts, childCtx)
     })
   } else if (_.name === 'gml:MultiSurface') {
     return rewind({

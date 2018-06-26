@@ -202,6 +202,80 @@ test('Polygon > exterior > Ring > curveMember > Curve > segments > LineStringSeg
   t.end()
 })
 
+test('Polygon > exterior > LinearRing > posList [@srsDimension = 3]', (t) => {
+  const p = h('gml:Polygon', [
+    h('gml:exterior', [
+      h('gml:LinearRing', [
+        h('gml:posList', { 'srsDimension': '3'}, '1 1 0 1 2 0 2 2 0')
+      ])
+    ])
+  ])
+
+  t.deepEqual(parse(p), rewind({
+    type: 'Polygon',
+    coordinates: [[
+      [1, 1, 0],
+      [1, 2, 0],
+      [2, 2, 0]
+    ]]
+  }))
+  t.end()
+})
+
+test('Polygon > exterior > LinearRing [@srsDimension = 3] > posList', (t) => {
+  const p = h('gml:Polygon', [
+    h('gml:exterior', [
+      h('gml:LinearRing', { 'srsDimension': '3'}, [
+        h('gml:posList', '1 1 0 1 2 0 2 2 0')
+      ])
+    ])
+  ])
+
+  t.deepEqual(parse(p), rewind({
+    type: 'Polygon',
+    coordinates: [[
+      [1, 1, 0],
+      [1, 2, 0],
+      [2, 2, 0]
+    ]]
+  }))
+  t.end()
+})
+
+test('Polygon [@srsDimension = 3] > exterior > LinearRing > posList', (t) => {
+  const p = h('gml:Polygon', { 'srsDimension': '3'}, [
+    h('gml:exterior', [
+      h('gml:LinearRing', [
+        h('gml:posList', '1 1 0 1 2 0 2 2 0')
+      ])
+    ])
+  ])
+
+  t.deepEqual(parse(p), rewind({
+    type: 'Polygon',
+    coordinates: [[
+      [1, 1, 0],
+      [1, 2, 0],
+      [2, 2, 0]
+    ]]
+  }))
+  t.end()
+})
+
+test('Polygon > exterior+interior > LinearRing > posList', (t) => {
+  const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
+    h('gml:exterior', [
+      h('gml:LinearRing', [posList(coordsB)])
+    ]),
+    h('gml:interior', [
+      h('gml:LinearRing', [posList(coordsC)])
+    ])
+  ])
+
+  t.deepEqual(parse(p, {transformCoords: scaleByTen}), withHole)
+  t.end()
+})
+
 test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) => {
   const p = h('gml:Surface', {'gml:id': 'some-id'}, [
     h('gml:patches', [
@@ -241,6 +315,37 @@ test('Surface > patches > Rectangle*2 > exterior > LinearRing > posList', (t) =>
   t.deepEqual(parse(p, {transformCoords: scaleByTen}), multiExterior)
   t.end()
 })
+
+test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) => {
+
+  const p = h('gml:Surface', {'gml:id': 'some-id', 'srsDimension': '3'}, [
+    h('gml:patches', [
+      h('gml:PolygonPatch', {'gml:id': 'a'}, [
+        h('gml:exterior', [
+          h('gml:LinearRing', { 'srsDimension': '2' }, [posList([[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]])])
+        ])
+      ]),
+      h('gml:PolygonPatch', {'gml:id': 'b'}, [
+        h('gml:exterior', [
+          h('gml:LinearRing', [posList([[2, 2, 0], [2, 5, 1], [5, 5, 2], [5, 2, 3], [2, 2, 4]])])
+        ])
+      ])
+    ])
+  ])
+
+  t.deepEqual(parse(p, {transformCoords: scaleByTen}), rewind({
+    type: 'MultiPolygon',
+    coordinates: [
+      [
+        [[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]
+      ], [
+        [[20, 20, 0], [20, 50, 10], [50, 50, 20], [50, 20, 30], [20, 20, 40]]
+      ]
+    ]
+  }))
+  t.end()
+})
+
 
 test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t) => {
   const s1 = h('gml:Surface', {'gml:id': 's1'}, [
@@ -311,20 +416,6 @@ test('MultiSurface > surfaceMember > CompositeSurface > surfaceMember > Polygon 
   ])
 
   t.deepEqual(parse(m, {transformCoords: scaleByTen}), multiExterior)
-  t.end()
-})
-
-test('Polygon > exterior+interior > LinearRing > posList', (t) => {
-  const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
-    h('gml:exterior', [
-      h('gml:LinearRing', [posList(coordsB)])
-    ]),
-    h('gml:interior', [
-      h('gml:LinearRing', [posList(coordsC)])
-    ])
-  ])
-
-  t.deepEqual(parse(p, {transformCoords: scaleByTen}), withHole)
   t.end()
 })
 
