@@ -162,29 +162,33 @@ const parseExteriorOrInterior = (_, opts, ctx = {}) => {
 }
 
 const parsePolygonOrRectangle = (_, opts, ctx = {}) => { // or PolygonPatch
+  const childCtx = createChildContext(_, opts, ctx)
+
   const exterior = findIn(_, 'gml:exterior')
   if (!exterior) throw new Error('invalid ' + _.name + ' element')
 
   const pointLists = [
-    parseExteriorOrInterior(exterior, opts, ctx)
+    parseExteriorOrInterior(exterior, opts, childCtx)
   ]
 
   for (let c of _.children) {
     if (c.name !== 'gml:interior') continue
-    pointLists.push(parseExteriorOrInterior(c, opts, ctx))
+    pointLists.push(parseExteriorOrInterior(c, opts, childCtx))
   }
 
   return pointLists
 }
 
 const parseSurface = (_, opts, ctx = {}) => {
+  const childCtx = createChildContext(_, opts, ctx)
+
   const patches = findIn(_, 'gml:patches')
   if (!patches) throw new Error('invalid ' + _.name + ' element')
 
   const polygons = []
   for (let c of patches.children) {
     if (c.name !== 'gml:PolygonPatch' && c.name !== 'gml:Rectangle') continue
-    polygons.push(parsePolygonOrRectangle(c, opts, ctx))
+    polygons.push(parsePolygonOrRectangle(c, opts, childCtx))
   }
 
   if (polygons.length === 0) throw new Error(_.name + ' must have > 0 polygons')
@@ -192,14 +196,16 @@ const parseSurface = (_, opts, ctx = {}) => {
 }
 
 const parseCompositeSurface = (_, opts, ctx = {}) => {
+  const childCtx = createChildContext(_, opts, ctx)
+
   const polygons = []
   for (let c of _.children) {
     if (c.name === 'gml:surfaceMember') {
       const c2 = c.children[0]
       if (c2.name === 'gml:Surface') {
-        polygons.push(...parseSurface(c2, opts, ctx))
+        polygons.push(...parseSurface(c2, opts, childCtx))
       } else if (c2.name === 'gml:Polygon') {
-        polygons.push(parsePolygonOrRectangle(c2, opts, ctx))
+        polygons.push(parsePolygonOrRectangle(c2, opts, childCtx))
       }
     }
   }
@@ -252,7 +258,7 @@ const parse = (_, opts = { transformCoords: noTransform, stride: 2 }, ctx = {}) 
   } else if (_.name === 'gml:MultiSurface') {
     return rewind({
       type: 'MultiPolygon',
-      coordinates: parseMultiSurface(_, opts, ctx)
+      coordinates: parseMultiSurface(_, opts, childCtx)
     })
   }
   return null // todo
