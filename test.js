@@ -55,7 +55,7 @@ const pos5 = (coords) => {
 }
 const point5 = (coords) => {
   return coords.map((c, i) => {
-    return h('gml:Point', {'gml:id': i + ''}, [
+    return h('gml:Point', {'gml:id': i + '', 'srsDimension': '2'}, [
       h('gml:pos', [c.join(' ')])
     ])
   })
@@ -97,7 +97,7 @@ test('Polygon > exterior > LinearRing > Point*5 > pos', (t) => {
     ])
   ])
 
-  t.deepEqual(parse(p, {transformCoords: scaleByTen}), simpleExterior)
+  t.deepEqual(parse(p, {transformCoords: scaleByTen, stride: 100}), simpleExterior)
   t.end()
 })
 
@@ -115,7 +115,7 @@ test('Rectangle > exterior > LinearRing > posList', (t) => {
 test('Polygon > exterior > Ring > curveMember > LineString > posList', (t) => {
   const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
     h('gml:exterior', [
-      h('gml:Ring', [
+      h('gml:Ring', {'srsDimension': 2}, [
         h('gml:curveMember', [
           h('gml:LineString', [posList(coordsA)])
         ])
@@ -123,7 +123,7 @@ test('Polygon > exterior > Ring > curveMember > LineString > posList', (t) => {
     ])
   ])
 
-  t.deepEqual(parse(p, {transformCoords: scaleByTen}), simpleExterior)
+  t.deepEqual(parse(p, {transformCoords: scaleByTen, stride: 100}), simpleExterior)
   t.end()
 })
 
@@ -172,7 +172,7 @@ test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringS
 
   const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
     h('gml:exterior', [
-      h('gml:Ring', [
+      h('gml:Ring', {'srsDimension': '2'}, [
         h('gml:curveMember', [
           h('gml:Curve', [
             h('gml:segments', [seg1])
@@ -188,7 +188,7 @@ test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringS
   ])
   // console.error(require('util').inspect(p, {depth: Infinity}))
 
-  t.deepEqual(parse(p, {transformCoords: scaleByTen}), simpleExterior)
+  t.deepEqual(parse(p, {transformCoords: scaleByTen, stride: 100}), simpleExterior)
   t.end()
 })
 
@@ -368,12 +368,12 @@ test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t)
       ])
     ])
   ])
-  const m = h('gml:MultiSurface', {'gml:id': 'm'}, [
+  const m = h('gml:MultiSurface', {'gml:id': 'm', 'srsDimension': '2'}, [
     h('gml:surfaceMember', [s1]),
     h('gml:surfaceMember', [s2])
   ])
 
-  t.deepEqual(parse(m, {transformCoords: scaleByTen}), multiExterior)
+  t.deepEqual(parse(m, {transformCoords: scaleByTen, stride: 100}), multiExterior)
   t.end()
 })
 
@@ -487,7 +487,7 @@ test('stride === 3', (t) => {
     ])
   ])
 
-  t.deepEqual(parse(p, { transformCoords: scaleByTen, stride: 3 }), rewind({
+  t.deepEqual(parse(p, {transformCoords: scaleByTen, stride: 3}), rewind({
     type: 'Polygon',
     coordinates: [[
       [10, 10, 0],
