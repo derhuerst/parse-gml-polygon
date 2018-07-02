@@ -78,6 +78,15 @@ const parsePos = (_, opts, ctx = {}) => {
   return points[0]
 }
 
+const parsePoint = (_, opts, ctx = {}) => {
+  const childCtx = createChildContext(_, opts, ctx)
+
+  // TODO AV: Parse other gml:Point options
+  const pos = findIn(_, 'gml:pos')
+  if (!pos) throw new Error('invalid gml:Point element, expected a gml:pos subelement')
+  return parsePos(pos, opts, childCtx)
+}
+
 const parseLinearRingOrLineString = (_, opts, ctx = {}) => { // or a LineStringSegment
   const childCtx = createChildContext(_, opts, ctx)
 
@@ -88,10 +97,7 @@ const parseLinearRingOrLineString = (_, opts, ctx = {}) => { // or a LineStringS
   else {
     for (let c of _.children) {
       if (c.name === 'gml:Point') {
-        const grandChildCtx = createChildContext(c, opts, childCtx)
-        const pos = findIn(c, 'gml:pos')
-        if (!pos) continue
-        points.push(parsePos(pos, opts, grandChildCtx))
+        points.push(parsePoint(c, opts, childCtx))
       } else if (c.name === 'gml:pos') {
         points.push(parsePos(c, opts, childCtx))
       }
