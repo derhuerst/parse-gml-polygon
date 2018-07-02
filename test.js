@@ -55,7 +55,7 @@ const pos5 = (coords) => {
 }
 const point5 = (coords) => {
   return coords.map((c, i) => {
-    return h('gml:Point', {'gml:id': i + '', 'srsDimension': '2'}, [
+    return h('gml:Point', {'gml:id': i + ''}, [
       h('gml:pos', [c.join(' ')])
     ])
   })
@@ -97,7 +97,7 @@ test('Polygon > exterior > LinearRing > Point*5 > pos', (t) => {
     ])
   ])
 
-  t.deepEqual(parse(p, {transformCoords: scaleByTen, stride: 100}), simpleExterior)
+  t.deepEqual(parse(p, {transformCoords: scaleByTen}), simpleExterior)
   t.end()
 })
 
@@ -172,7 +172,7 @@ test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringS
 
   const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
     h('gml:exterior', [
-      h('gml:Ring', {'srsDimension': '2'}, [
+      h('gml:Ring', [
         h('gml:curveMember', [
           h('gml:Curve', [
             h('gml:segments', [seg1])
@@ -188,7 +188,7 @@ test('Polygon > exterior > Ring > curveMember*2 > Curve > segments > LineStringS
   ])
   // console.error(require('util').inspect(p, {depth: Infinity}))
 
-  t.deepEqual(parse(p, {transformCoords: scaleByTen, stride: 100}), simpleExterior)
+  t.deepEqual(parse(p, {transformCoords: scaleByTen}), simpleExterior)
   t.end()
 })
 
@@ -273,20 +273,6 @@ test('Polygon [@srsDimension = 3] > exterior > LinearRing > posList', (t) => {
   t.end()
 })
 
-test('Polygon > exterior+interior > LinearRing > posList', (t) => {
-  const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
-    h('gml:exterior', [
-      h('gml:LinearRing', [posList(coordsB)])
-    ]),
-    h('gml:interior', [
-      h('gml:LinearRing', [posList(coordsC)])
-    ])
-  ])
-
-  t.deepEqual(parse(p, {transformCoords: scaleByTen}), withHole)
-  t.end()
-})
-
 test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) => {
   const p = h('gml:Surface', {'gml:id': 'some-id'}, [
     h('gml:patches', [
@@ -327,26 +313,6 @@ test('Surface > patches > Rectangle*2 > exterior > LinearRing > posList', (t) =>
   t.end()
 })
 
-test('Surface > patches > PolygonPatch > exterior > LinearRing > posList', (t) => {
-  const p = h('gml:Surface', {'gml:id': 'some-id', 'srsDimension': '3'}, [
-    h('gml:patches', [
-      h('gml:PolygonPatch', {'gml:id': 'a'}, [
-        h('gml:exterior', [
-          h('gml:LinearRing', { 'srsDimension': '2' }, [posList(coordsA)])
-        ])
-      ]),
-      h('gml:PolygonPatch', {'gml:id': 'b'}, [
-        h('gml:exterior', [
-          h('gml:LinearRing', [posList(coordsB3D)])
-        ])
-      ])
-    ])
-  ])
-
-  t.deepEqual(parse(p, {transformCoords: scaleByTen}), multiExterior2D3D)
-  t.end()
-})
-
 test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t) => {
   const s1 = h('gml:Surface', {'gml:id': 's1'}, [
     h('gml:patches', [
@@ -366,12 +332,12 @@ test('MultiSurface > surfaceMember*2 > Surface > patches > Rectangle > …', (t)
       ])
     ])
   ])
-  const m = h('gml:MultiSurface', {'gml:id': 'm', 'srsDimension': '2'}, [
+  const m = h('gml:MultiSurface', {'gml:id': 'm'}, [
     h('gml:surfaceMember', [s1]),
     h('gml:surfaceMember', [s2])
   ])
 
-  t.deepEqual(parse(m, {transformCoords: scaleByTen, stride: 100}), multiExterior)
+  t.deepEqual(parse(m, {transformCoords: scaleByTen}), multiExterior)
   t.end()
 })
 
@@ -447,27 +413,17 @@ test('MultiSurface > surfaceMember > CompositeSurface > surfaceMember > Polygon 
   t.end()
 })
 
-test('MultiSurface > surfaceMember > CompositeSurface [ @srsDimension = 3 ] > surfaceMember > Polygon > …', (t) => {
-  const p1 = h('gml:Polygon', {'gml:id': 'p1', 'srsDimension': '2'}, [
+test('Polygon > exterior+interior > LinearRing > posList', (t) => {
+  const p = h('gml:Polygon', {'gml:id': 'some-id'}, [
     h('gml:exterior', [
-      h('gml:LinearRing', [posList(coordsA)])
-    ])
-  ])
-  const p2 = h('gml:Polygon', {'gml:id': 'p2'}, [
-    h('gml:exterior', [
-      h('gml:LinearRing', [posList(coordsB3D)])
-    ])
-  ])
-  const m = h('gml:MultiSurface', {'gml:id': 'm'}, [
-    h('gml:surfaceMember', [
-      h('gml:CompositeSurface', {'gml:id': 'c', 'srsDimension': '3'}, [
-        h('gml:surfaceMember', [p1]),
-        h('gml:surfaceMember', [p2])
-      ])
+      h('gml:LinearRing', [posList(coordsB)])
+    ]),
+    h('gml:interior', [
+      h('gml:LinearRing', [posList(coordsC)])
     ])
   ])
 
-  t.deepEqual(parse(m, {transformCoords: scaleByTen}), multiExterior2D3D)
+  t.deepEqual(parse(p, {transformCoords: scaleByTen}), withHole)
   t.end()
 })
 
