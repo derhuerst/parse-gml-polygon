@@ -22,7 +22,7 @@
 		"node": ">=6"
 	},
 	"devDependencies": {
-		"get-stream": "^3.0.0",
+		"get-stream": "^4.0.0",
 		"hyper-xml": "^0.1.1",
 		"snazzy": "^7.1.1",
 		"standard": "^11.0.1",
