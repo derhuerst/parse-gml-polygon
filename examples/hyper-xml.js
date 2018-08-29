@@ -3,7 +3,7 @@
 const h = require('hyper-xml')
 const parsePolygon = require('..')
 
-const el = h('gml:Polygon', {'gml:id': 'some-id'}, [
+const el = h('gml:Polygon', { 'gml:id': 'some-id' }, [
   h('gml:exterior', [
     // triangle of 0|0 0|3 3|3
     h('gml:LinearRing', [

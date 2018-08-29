@@ -4,11 +4,11 @@ const path = require('path')
 const fs = require('fs')
 const xmlReader = require('xml-reader')
 const sink = require('get-stream')
-const {inspect} = require('util')
+const { inspect } = require('util')
 const parsePolygon = require('..')
 
 const file = path.join(__dirname, 'polygon.gml')
-const reader = fs.createReadStream(file, {encoding: 'utf8'})
+const reader = fs.createReadStream(file, { encoding: 'utf8' })
 
 // todo: make this streaming as soon as pladaria/xml-reader#9
 const parser = xmlReader.create({
@@ -23,5 +23,5 @@ sink(reader)
 
 parser.once('tag:gml:Polygon', (data) => {
   const parsed = parsePolygon(data)
-  console.log(inspect(parsed, {colors: true, depth: Infinity}))
+  console.log(inspect(parsed, { colors: true, depth: Infinity }))
 })

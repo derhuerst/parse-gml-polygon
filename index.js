@@ -5,7 +5,7 @@ const rewind = require('@turf/rewind')
 
 const noTransform = (...coords) => coords
 
-const parseCoords = (s, opts = {transformCoords: noTransform, stride: 2}, ctx = {}) => {
+const parseCoords = (s, opts = { transformCoords: noTransform, stride: 2 }, ctx = {}) => {
   const stride = ctx.srsDimension || opts.stride || 2
   const transformCoords = opts.transformCoords || noTransform
 
