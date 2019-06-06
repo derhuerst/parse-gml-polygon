@@ -1,7 +1,7 @@
 'use strict'
 
-import deepStrictEqual from 'deep-strict-equal'
-import rewind from '@turf/rewind'
+const deepStrictEqual = require('deep-strict-equal')
+const rewind = require('@turf/rewind').default
 
 const noTransform = (...coords) => coords
 
@@ -285,5 +285,4 @@ Object.assign(parse, {
   parseCompositeSurface,
   parseMultiSurface
 })
-
-export default parse
+module.exports = parse
